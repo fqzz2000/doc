@@ -1,13 +1,29 @@
 # axaddrspace
 
-## 介绍
+## 概览
 
-内存虚拟化由[axaddrspace](https://github.com/arceos-hypervisor/axaddrspace)实现，该模块与架构无关，负责管理和映射客户虚拟机的二级地址空间（GPA -> HPA）
+[axaddrspace](https://github.com/arceos-hypervisor/axaddrspace)是AxVisor内存虚拟化的核心模块，为客户机提供了管理地址空间的能力。该模块通过嵌套页表(nested page table, NPT)管理和映射客户机物理地址G(Guest Physical Address, GPA) 到宿主机物理地址的映射(Host Physical Address, HPA)。axaddrspace通过统一的API提供了地址空间的抽象，隐藏了地址翻译，页表管理以及架构相关的复杂逻辑。
 
 ![](../assets/pt.png)
 
+## 背景知识：内存虚拟化
+VMM通过内存虚拟化为管理的客户操作系统提供内存隔离。类似于操作系统通过不同的地址空间隔离不同进程的内存，VMM也通过地址空间的方式来隔离不同虚拟机实例的地址空间。内存虚拟化通过两次地址转换来支持地址空间的虚拟化，当虚拟机实例内的用户态进程访问内存时，需要完成客户机虚拟地址(Guest Virtual Address, GVA)->客户机物理地址(Guest Physical Address, GPA)->宿主机物理地址(Host Physical Address, HPA)的转换。其中， GVA->GPA的转换由客户机软件完成，通常是由客户机操作系统维护的页表完成。而GPA->HPA的转换由VMM决定，VMM在物理内存分配给客户机时就确定了GPA->HPA的转换，并通过内部的数据结构记录映射关系。
+
+现代的CPU的虚拟化模块大多对这个架构提供了硬件上的支持，直接在硬件上支持GVA->GPA->HPA的二级地址转换。具体的实现细节随架构有所不同，
+
+## 设计目标
+
+axaddrspace需要提供以下功能。
+
+1. 通过硬件支持的二阶地址转换能力实现GPA到HPA的地址转换
+2. 为不同的架构提供统一的抽象
+3. 对于动态内存分配，需要能够处理page fault
+4. 管理外部设备的内存空间 
+
 
 ## 系统架构
+
+## 总体架构
 
 ### 模块组织
 
